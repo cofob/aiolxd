@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "aiolxd"
+version = "0.1.0"
+description = "AsyncIO LXD API for Python 3"
+authors = ["Egor Ternovoy <cofob@riseup.net>"]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4"
+
+aiohttp = "^3.8.3" # HTTP client
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.8.0" # Code formatter
+mypy = "^0.982" # Static type checking
+isort = "^5.10.1" # Import sorting
+flake8 = "^5.0.4" # Linter
+pre-commit = "^2.20.0" # Git pre commit hooks
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+target-version = ['py310']

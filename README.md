@@ -1,2 +1,3 @@
 # aiolxd
-AsyncIO LXD API for Python 3
+
+WIP AsyncIO LXD API for Python 3.

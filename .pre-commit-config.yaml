@@ -1,0 +1,34 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-docstring-first
+  - id: check-vcs-permalinks
+  - id: check-yaml
+  - id: destroyed-symlinks
+  - id: detect-private-key
+  - id: mixed-line-ending
+    args: ["--fix=lf"]
+- repo: https://github.com/python-poetry/poetry
+  rev: '1.2.2'
+  hooks:
+    - id: poetry-check
+    - id: poetry-lock
+    - id: poetry-export
+      args: ["-f", "requirements.txt", "-o", "requirements.txt"]
+    - id: poetry-export
+      name: poetry-export-dev
+      args: ["-f", "requirements.txt", "-o", "requirements-dev.txt", "--with", "dev"]
+- repo: local
+  hooks:
+    - id: migrate-db
+      name: migrate-db
+      entry: python -m lxdapi db migrate
+      language: system
+      pass_filenames: false
+    - id: make-test
+      name: make-test
+      entry: make test
+      language: system
+      pass_filenames: false
