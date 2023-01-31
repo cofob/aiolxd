@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "aiolxd"
-version = "0.1.0"
+version = "0.1.0-r1"
 description = "AsyncIO LXD API for Python 3"
 authors = ["Egor Ternovoy <cofob@riseup.net>"]
+repository = "https://github.com/cofob/aiolxd"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4"
