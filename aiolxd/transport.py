@@ -167,7 +167,7 @@ class AbstractTransport(ABC):
 
     def __getattr__(self, name: str) -> TransportProxyCaller:
         """Return a proxy caller for the given path."""
-        return TransportProxyCaller(name, self)
+        return TransportProxyCaller("/1.0/" + name, self)
 
 
 class AsyncTransport(AbstractTransport):
@@ -211,7 +211,7 @@ class AsyncTransport(AbstractTransport):
             args["json"] = data
 
         # Update URL with query parameters
-        url = f"{self._url}/{path}"
+        url = f"{self._url}{path}"
         if any((recursion is not None, filter is not None)):
             params = {}
             if recursion is not None:
@@ -219,8 +219,6 @@ class AsyncTransport(AbstractTransport):
             if filter is not None:
                 params["filter"] = filter
             url = update_query_params(url, params)
-
-        print(url)
 
         # Make request
         response = await self._session.request(method.value, url, **self._kwargs, **args)

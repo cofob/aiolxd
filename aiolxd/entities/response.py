@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 
 
 class BaseResponse:
     type_: str
-    metadata: Optional[Dict[str, Any]]
+    metadata: Optional[Union[Dict[str, Any], List[Any]]]
 
 
 @dataclass
