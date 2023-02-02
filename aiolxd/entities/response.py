@@ -1,18 +1,18 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 class BaseResponse:
     type_: str
-    metadata: Dict[str, Any]
+    metadata: Optional[Dict[str, Any]]
 
 
 @dataclass
 class SyncResponse(BaseResponse):
     # Duplication is required for dataclasses to work
     type_: str
-    metadata: Dict[str, Any]
+    metadata: Optional[Dict[str, Any]]
 
     status: str
     status_code: "StatusCode"
@@ -21,7 +21,7 @@ class SyncResponse(BaseResponse):
 @dataclass
 class AsyncResponse(BaseResponse):
     type_: str
-    metadata: Dict[str, Any]
+    metadata: Optional[Dict[str, Any]]
 
     status: str
     status_code: "StatusCode"
@@ -31,7 +31,7 @@ class AsyncResponse(BaseResponse):
 @dataclass
 class ErrorResponse(BaseResponse):
     type_: str
-    metadata: Dict[str, Any]
+    metadata: Optional[Dict[str, Any]]
 
     error: str
     error_code: "StatusCode"
