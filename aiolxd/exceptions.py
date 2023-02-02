@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from aiohttp import ClientResponse
 from aiohttp.typedefs import CIMultiDictProxy
@@ -14,7 +14,7 @@ class AioLXDException(Exception):
 class AioLXDResponseError(AioLXDException):
     """Base exception for all AioLXD response errors."""
 
-    def __init__(self, response: ClientResponse, detail: str | None = None) -> None:
+    def __init__(self, response: ClientResponse, detail: Optional[str] = None) -> None:
         """Initialize exception."""
         self.response = response
         self.detail = f"Response error: {response.status}" if detail is None else detail
@@ -34,7 +34,7 @@ class AioLXDResponseError(AioLXDException):
         return self.response.status
 
     @property
-    def reason(self) -> str | None:
+    def reason(self) -> Optional[str]:
         """Return response reason."""
         return self.response.reason
 
@@ -43,11 +43,11 @@ class AioLXDResponseError(AioLXDException):
         """Return response headers."""
         return self.response.headers
 
-    async def text(self) -> str | None:
+    async def text(self) -> Optional[str]:
         """Return response text."""
         return await self.response.text()
 
-    async def json(self) -> Any | None:
+    async def json(self) -> Optional[Any]:
         """Return response json."""
         return await self.response.json()
 
@@ -55,7 +55,7 @@ class AioLXDResponseError(AioLXDException):
 class AioLXDResponseValidationError(AioLXDResponseError):
     """Exception for AioLXD response validation errors."""
 
-    def __init__(self, response: ClientResponse, error: PydanticValueError, detail: str | None = None) -> None:
+    def __init__(self, response: ClientResponse, error: PydanticValueError, detail: Optional[str] = None) -> None:
         """Initialize exception."""
         self.error = error
         self.detail = f"Response validation error: {error.code}" if detail is None else detail
@@ -65,7 +65,7 @@ class AioLXDResponseValidationError(AioLXDResponseError):
 class AioLXDResponseInvalidCode(AioLXDResponseError):
     """Exception for AioLXD invalid response codes."""
 
-    def __init__(self, response: ClientResponse, detail: str | None = None) -> None:
+    def __init__(self, response: ClientResponse, detail: Optional[str] = None) -> None:
         """Initialize exception."""
         self.detail = f"Invalid response code: {response.status}" if detail is None else detail
         super().__init__(response, self.detail)
@@ -74,7 +74,7 @@ class AioLXDResponseInvalidCode(AioLXDResponseError):
 class AioLXDResponseNotFound(AioLXDResponseError):
     """Exception for AioLXD not found errors."""
 
-    def __init__(self, response: ClientResponse, detail: str | None = None) -> None:
+    def __init__(self, response: ClientResponse, detail: Optional[str] = None) -> None:
         """Initialize exception."""
         self.detail = f"Not found: {response.status}" if detail is None else detail
         super().__init__(response, self.detail)

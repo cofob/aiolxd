@@ -7,10 +7,10 @@ repository = "https://github.com/cofob/aiolxd"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4"
+python = ">=3.8,<4"
 
-aiohttp = "^3.8.3" # HTTP client
-pydantic = "^1.10.4" # Data validation
+aiohttp = "^3.8" # HTTP client
+pydantic = "^1.10" # Data validation
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.8.0" # Code formatter
