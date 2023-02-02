@@ -2,7 +2,7 @@ import json
 import ssl
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Coroutine, Dict, Optional, TypeVar
+from typing import Any, Coroutine, Dict, Optional, Tuple, TypeVar
 
 import aiohttp
 
@@ -175,7 +175,7 @@ class AsyncTransport(AbstractTransport):
         self,
         url: str,
         session: Optional[aiohttp.ClientSession] = None,
-        cert: Optional[tuple[str, str]] = None,
+        cert: Optional[Tuple[str, str]] = None,
         verify: Optional[bool] = None,
         **kwargs: Any,
     ) -> None:
@@ -235,7 +235,7 @@ class AsyncTransport(AbstractTransport):
             raise AioLXDResponseError(
                 response, detail=f"Response is not JSON: {response.content_type} while expecting application/json"
             )
-        except aiohttp.ClientError as e:
+        except aiohttp.ClientError:
             raise AioLXDResponseError(response)
         except json.JSONDecodeError as e:
             raise AioLXDResponseError(response, detail=f"Response is not JSON: Failed to decode JSON: {e}")
