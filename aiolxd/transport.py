@@ -2,7 +2,7 @@ import json
 import ssl
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Callable, Coroutine, Dict, Optional, TypeVar
+from typing import Any, Coroutine, Dict, Optional, TypeVar
 
 import aiohttp
 
@@ -81,8 +81,18 @@ class AbstractTransport(ABC):
         data: Optional[Dict[str, Any]] = None,
         *,
         recursion: Optional[bool] = None,
+        filter: Optional[str] = None,
     ) -> BaseResponse:
-        """Make a request to the LXD API."""
+        """Make a request to the LXD API.
+
+        Args:
+            method: The HTTP method to use.
+            path: The path to the resource.
+            data: The data to send with the request.
+            recursion: Whether to recurse into sub-resources.
+            filter: A filter to apply to the response. String at the moment, but
+                    will be changed to a proper filter object in the future.
+        """
         pass
 
     def get(self, path: str, **kwargs: Any) -> Coroutine[Any, Any, BaseResponse]:
@@ -193,6 +203,7 @@ class AsyncTransport(AbstractTransport):
         data: Optional[Dict[str, Any]] = None,
         *,
         recursion: Optional[bool] = None,
+        filter: Optional[str] = None,
     ) -> BaseResponse:
         # Prepare request
         args = {}
@@ -201,10 +212,12 @@ class AsyncTransport(AbstractTransport):
 
         # Update URL with query parameters
         url = f"{self._url}/{path}"
-        if any((recursion is not None,)):
+        if any((recursion is not None, filter is not None)):
             params = {}
             if recursion is not None:
                 params["recursion"] = "1" if recursion else "0"
+            if filter is not None:
+                params["filter"] = filter
             url = update_query_params(url, params)
 
         print(url)
