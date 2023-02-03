@@ -8,6 +8,30 @@ from aiolxd.transport import AbstractTransport
 
 
 class LazyEntity(BaseModel):
+    """Base class for entities that are lazily fetched from the server.
+
+    This is used for entities that are returned as an operation string
+    instead of the full object.
+
+    Internally, this is a pydantic model that is filled with the data
+    from the server when the fetch method is called.
+
+    Example:
+        >>> from aiolxd.entities.abc import LazyEntity
+        >>>
+        >>> class MyEntity(LazyEntity):
+        ...     foo: str
+        ...
+        >>> entity = MyEntity(None, operation="/1.0/operations/123")
+        >>> await entity.fetch()
+        >>> entity.foo
+        'bar'
+        >>>
+        >>> entity = MyEntity(None, data={"foo": "bar"})
+        >>> entity.foo
+        'bar'
+    """
+
     def __init__(
         self, transport: AbstractTransport, operation: Optional[str] = None, data: Optional[Dict[str, Any]] = None
     ) -> None:
