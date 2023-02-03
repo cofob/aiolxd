@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 from aiohttp import ClientResponse
 from aiohttp.typedefs import CIMultiDictProxy
-from pydantic.errors import PydanticValueError
+from pydantic.error_wrappers import ValidationError
 
 
 class AioLXDException(Exception):
@@ -52,14 +52,14 @@ class AioLXDResponseError(AioLXDException):
         return await self.response.json()
 
 
-class AioLXDResponseValidationError(AioLXDResponseError):
+class AioLXDValidationError(AioLXDException):
     """Exception for AioLXD response validation errors."""
 
-    def __init__(self, response: ClientResponse, error: PydanticValueError, detail: Optional[str] = None) -> None:
+    def __init__(self, error: ValidationError, detail: Optional[str] = None) -> None:
         """Initialize exception."""
         self.error = error
-        self.detail = f"Response validation error: {error.code}" if detail is None else detail
-        super().__init__(response, self.detail)
+        self.detail = f"Validation error: {error.errors()}" if detail is None else detail
+        super().__init__(self.detail)
 
 
 class AioLXDResponseInvalidCode(AioLXDResponseError):

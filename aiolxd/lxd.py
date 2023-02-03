@@ -25,12 +25,8 @@ class LXD(BaseLXD):
         if not isinstance(resp.metadata, list):
             raise RuntimeError("Invalid response")
         if recursion:
-            lst = [InstanceEntity(self.transport) for _ in resp.metadata]
-            for i, instance in enumerate(lst):
-                instance.fill(resp.metadata[i])
-        else:
-            lst = [InstanceEntity(self.transport, operation) for operation in resp.metadata]
-        return lst
+            return [InstanceEntity(self.transport, object=i) for i in resp.metadata]
+        return [InstanceEntity(self.transport, operation) for operation in resp.metadata]
 
     async def __aenter__(self: T) -> T:
         """Async context manager entry point."""
