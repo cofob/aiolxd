@@ -12,7 +12,7 @@ class BaseResponse:
 class SyncResponse(BaseResponse):
     # Duplication is required for dataclasses to work
     type_: str
-    metadata: Optional[Dict[str, Any]]
+    metadata: Optional[Union[Dict[str, Any], List[Any]]]
 
     status: str
     status_code: "StatusCode"
@@ -21,7 +21,7 @@ class SyncResponse(BaseResponse):
 @dataclass
 class AsyncResponse(BaseResponse):
     type_: str
-    metadata: Optional[Dict[str, Any]]
+    metadata: Optional[Union[Dict[str, Any], List[Any]]]
 
     status: str
     status_code: "StatusCode"
@@ -31,7 +31,7 @@ class AsyncResponse(BaseResponse):
 @dataclass
 class ErrorResponse(BaseResponse):
     type_: str
-    metadata: Optional[Dict[str, Any]]
+    metadata: Optional[Union[Dict[str, Any], List[Any]]]
 
     error: str
     error_code: "StatusCode"

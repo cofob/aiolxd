@@ -55,7 +55,8 @@ class LazyEntity(BaseModel):
         return self.__class__.__name__ + f"({self if self._is_fetched else ('Unfetched ' + str(self._operation))})"
 
     def __setattr__(self, name: str, value: Any) -> None:
-        # if name starts with _ or is not a field, set it directly
+        # if name starts with _, set it directly
+        # this is used to set the _transport and _operation attributes
         if name.startswith("_"):
             return object.__setattr__(self, name, value)
         return super().__setattr__(name, value)

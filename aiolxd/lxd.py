@@ -2,7 +2,9 @@ from abc import ABC
 from typing import Any, Type, TypeVar
 
 from .entities.instance import InstanceEntity
+from .entities.response import SyncResponse
 from .transport import AbstractTransport, AsyncTransport
+from .utils import ensure_response
 
 T = TypeVar("T", bound="BaseLXD")
 
@@ -22,6 +24,7 @@ class LXD(BaseLXD):
 
     async def instances(self, recursion: bool = False) -> list[InstanceEntity]:
         resp = await self.transport.instances(recursion=recursion)
+        resp = ensure_response(resp, list, SyncResponse)
         if not isinstance(resp.metadata, list):
             raise RuntimeError("Invalid response")
         if recursion:
