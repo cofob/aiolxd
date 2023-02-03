@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
@@ -9,7 +9,7 @@ from aiolxd.transport import AbstractTransport
 
 class LazyEntity(BaseModel):
     def __init__(
-        self, transport: AbstractTransport, operation: Optional[str] = None, data: Optional[dict[str, Any]] = None
+        self, transport: AbstractTransport, operation: Optional[str] = None, data: Optional[Dict[str, Any]] = None
     ) -> None:
         self._transport = transport
         self._operation = operation
@@ -26,7 +26,7 @@ class LazyEntity(BaseModel):
     def is_fetched(self) -> bool:
         return self._is_fetched
 
-    def fill(self, data: dict[str, Any]) -> None:
+    def fill(self, data: Dict[str, Any]) -> None:
         """Fill the object with the given data.
 
         This is used when recursion is enabled.

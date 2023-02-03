@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Type, TypeVar
+from typing import Any, List, Type, TypeVar
 
 from .entities.instance import InstanceEntity
 from .entities.response import SyncResponse
@@ -22,7 +22,7 @@ class LXD(BaseLXD):
         """Create a new instance of this class with an async transport."""
         return ctx(AsyncTransport(*args, **kwargs))
 
-    async def instances(self, recursion: bool = False) -> list[InstanceEntity]:
+    async def instances(self, recursion: bool = False) -> List[InstanceEntity]:
         resp = await self.transport.instances(recursion=recursion)
         resp = ensure_response(resp, list, SyncResponse)
         if not isinstance(resp.metadata, list):
