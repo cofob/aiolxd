@@ -1,7 +1,7 @@
-from abc import ABC
 from typing import Any, List, Type, TypeVar
 
-from .entities.instance import InstanceEntity
+from .api.abc import ApiEndpointGroup
+from .api.instance import InstanceGroup
 from .entities.response import SyncResponse
 from .entities.status import StatusEntity
 from .exceptions import AioLXDUntrustedCredentials
@@ -9,23 +9,10 @@ from .transport import AbstractTransport, AsyncTransport
 from .utils import ensure_response
 
 T = TypeVar("T", bound="LXD")
+T_API = TypeVar("T_API", bound="ApiEndpointGroup")
 
 
-class BaseLXD(ABC):
-    """Base LXD client.
-
-    It's needed only for type hints in mixins.
-    """
-
-    transport: AbstractTransport
-    api_extensions: List[str]
-
-    def is_supported(self, extension: str) -> bool:
-        """Check if an extension is supported."""
-        return extension in self.api_extensions
-
-
-class LXD(BaseLXD):
+class LXD:
     """LXD client.
 
     This is the main entry point for the LXD client. It provides access to
@@ -36,6 +23,9 @@ class LXD(BaseLXD):
     >>> async with LXD("https://localhost:8443") as lxd:
     ...     print(await lxd.instances())
     """
+
+    transport: AbstractTransport
+    api_extensions: List[str]
 
     def __init__(self, transport: AbstractTransport) -> None:
         """LXD client.
@@ -48,21 +38,20 @@ class LXD(BaseLXD):
         >>> async with LXD("https://localhost:8443") as lxd:
         ...     print(await lxd.instances())
         """
+
         self.transport = transport
+        self.api_extensions = []
+
+        self.instance = self._init_api_group(InstanceGroup)
 
     @classmethod
     def with_async(ctx: Type[T], *args: Any, **kwargs: Any) -> T:
         """Create a new instance of this class with an async transport."""
         return ctx(AsyncTransport(*args, **kwargs))
 
-    async def instances(self, recursion: bool = False) -> List[InstanceEntity]:
-        resp = await self.transport.instances(recursion=recursion)
-        resp = ensure_response(resp, list, SyncResponse)
-        if not isinstance(resp.metadata, list):
-            raise RuntimeError("Invalid response")
-        if recursion:
-            return [InstanceEntity(self.transport, data=i) for i in resp.metadata]
-        return [InstanceEntity(self.transport, operation) for operation in resp.metadata]
+    def _init_api_group(self, class_: Type[T_API], **kwargs: Any) -> T_API:
+        """Initialize an API endpoint group."""
+        return class_(self.transport, self.api_extensions, **kwargs)
 
     async def start(self) -> None:
         """Start the LXD client.

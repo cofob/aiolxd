@@ -4,7 +4,7 @@ from aiohttp import ClientResponse
 from aiohttp.typedefs import CIMultiDictProxy
 from pydantic.error_wrappers import ValidationError
 
-from aiolxd.entities.response import ErrorResponse
+from .entities.response import ErrorResponse
 
 
 class AioLXDException(Exception):

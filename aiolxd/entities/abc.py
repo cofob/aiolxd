@@ -3,8 +3,8 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
-from aiolxd.exceptions import AioLXDValidationError
-from aiolxd.transport import AbstractTransport
+from ..exceptions import AioLXDValidationError
+from ..transport import AbstractTransport
 
 
 class LazyEntity(BaseModel):
