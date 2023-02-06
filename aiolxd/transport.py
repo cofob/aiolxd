@@ -13,7 +13,7 @@ from .entities.response import (
     StatusCode,
     SyncResponse,
 )
-from .exceptions import AioLXDResponseError
+from .exceptions import AioLXDResponseError, AioLXDResponseTypeError
 from .utils import update_query_params
 
 T = TypeVar("T", bound="AbstractTransport")
@@ -147,6 +147,7 @@ class AbstractTransport(ABC):
             args["error"] = response["error"]
             args["error_code"] = StatusCode(response["error_code"])
             ret = ErrorResponse(**args)
+            raise AioLXDResponseTypeError(ret)
 
         if ret is None:
             raise ValueError(f"Invalid response type: {response['type']}")

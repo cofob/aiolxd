@@ -4,6 +4,8 @@ from aiohttp import ClientResponse
 from aiohttp.typedefs import CIMultiDictProxy
 from pydantic.error_wrappers import ValidationError
 
+from aiolxd.entities.response import ErrorResponse
+
 
 class AioLXDException(Exception):
     """Base exception for all AioLXD exceptions."""
@@ -78,3 +80,22 @@ class AioLXDResponseNotFound(AioLXDResponseError):
         """Initialize exception."""
         self.detail = f"Not found: {response.status}" if detail is None else detail
         super().__init__(response, self.detail)
+
+
+class AioLXDResponseTypeError(AioLXDException):
+    """Exception for AioLXD response type errors."""
+
+    def __init__(self, error: ErrorResponse, detail: Optional[str] = None) -> None:
+        """Initialize exception."""
+        self.detail = f"Error response: {error.error_code} {error.error}" if detail is None else detail
+        self.error = error
+        super().__init__(self.detail)
+
+
+class AioLXDUntrustedCredentials(AioLXDException):
+    """Exception for AioLXD untrusted credentials."""
+
+    def __init__(self, detail: Optional[str] = None) -> None:
+        """Initialize exception."""
+        self.detail = "Untrusted credentials" if detail is None else detail
+        super().__init__(self.detail)
