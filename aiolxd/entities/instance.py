@@ -36,11 +36,11 @@ class InstanceEntity(LazyEntity):
 
 class InstanceSource(BaseModel):
     alias: str
-    type_: str = Field(alias="type", default="image")
+    type: str = Field(default="image")
 
 
 class InstanceCreateRequest(BaseModel):
     architecture: str = "x86_64"
-    type_: str = Field(alias="type", default="container")
+    type: str = Field(default="container")
     name: str
     source: InstanceSource
