@@ -87,7 +87,7 @@ class AioLXDResponseTypeError(AioLXDException):
 
     def __init__(self, error: ErrorResponse, detail: Optional[str] = None) -> None:
         """Initialize exception."""
-        self.detail = f"Error response: {error.error_code} {error.error}" if detail is None else detail
+        self.detail = f"Error response: {error.error_code} {error.error} {error}" if detail is None else detail
         self.error = error
         super().__init__(self.detail)
 

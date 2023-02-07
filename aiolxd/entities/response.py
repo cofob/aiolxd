@@ -21,7 +21,7 @@ class SyncResponse(BaseResponse):
 @dataclass
 class AsyncResponse(BaseResponse):
     type_: str
-    metadata: Optional[Union[Dict[str, Any], List[Any]]]
+    metadata: Dict[str, Any]
 
     status: str
     status_code: "StatusCode"

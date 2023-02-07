@@ -58,6 +58,7 @@ class LXD:
 
         This run connection checks and other setup.
         """
+        await self.transport.spawn_ws()
         resp = await self.transport.get("/1.0")
         ensure_response(resp, dict, SyncResponse)
         if not isinstance(resp.metadata, dict):

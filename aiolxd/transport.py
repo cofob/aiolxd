@@ -1,6 +1,7 @@
 import json
 import ssl
 from abc import ABC, abstractmethod
+from asyncio import create_task
 from enum import Enum
 from typing import Any, Coroutine, Dict, Optional, Tuple, TypeVar
 
@@ -95,6 +96,11 @@ class AbstractTransport(ABC):
         """
         pass
 
+    @abstractmethod
+    async def websocket(self) -> None:
+        """Start a websocket connection to LXD events enspoint."""
+        pass
+
     def get(self, path: str, **kwargs: Any) -> Coroutine[Any, Any, BaseResponse]:
         """Make a GET request to the LXD API."""
         return self.request(RequestMethod.GET, path, **kwargs)
@@ -153,6 +159,10 @@ class AbstractTransport(ABC):
             raise ValueError(f"Invalid response type: {response['type']}")
 
         return ret
+
+    async def spawn_ws(self) -> None:
+        """Start websocket event loop asynchronously."""
+        create_task(self.websocket())
 
     async def close(self) -> None:
         """Close the transport."""
@@ -240,6 +250,15 @@ class AsyncTransport(AbstractTransport):
             raise AioLXDResponseError(response, detail=f"Response is not JSON: Failed to decode JSON: {e}")
 
         return self._process_response(obj)
+
+    async def websocket(self) -> None:
+        while True:
+            try:
+                async with self._session.ws_connect(self._url + "/1.0/events") as ws:
+                    async for msg in ws:
+                        pass
+            except Exception as e:
+                print(f"Exception occured in events websocket: {e}")
 
     async def close(self) -> None:
         if self._session_owner:
