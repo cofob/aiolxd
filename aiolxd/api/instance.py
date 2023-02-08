@@ -13,6 +13,14 @@ from .abc import ApiEndpointGroup
 class InstanceGroup(ApiEndpointGroup):
     """API endpoint group for instances."""
 
+    async def get(self, name: str) -> InstanceEntity:
+        """Get instance by name."""
+        resp = await self.transport.instances.slash(name).get()
+        resp = ensure_response(resp, dict, SyncResponse)
+        if not isinstance(resp.metadata, dict):
+            raise TypeError("Expected dict, got {!r}".format(resp.metadata))
+        return InstanceEntity(self.transport, data=resp.metadata)
+
     async def list(self, recursion: bool = False) -> List[InstanceEntity]:
         """List all instances."""
         resp = await self.transport.instances(recursion=recursion)
@@ -31,7 +39,8 @@ class InstanceGroup(ApiEndpointGroup):
         source: str,
         source_type: str = "image",
         type_: str = "container",
-    ) -> None:
+    ) -> AsyncResponse:
+        """Create instance."""
         body = InstanceCreateRequest(
             architecture=architecture,
             name=name,
@@ -40,3 +49,10 @@ class InstanceGroup(ApiEndpointGroup):
         )
         resp = await self.transport.instances.post(data=body.dict())
         resp = ensure_response(resp, dict, AsyncResponse)
+        return resp
+
+    async def delete(self, name: str) -> AsyncResponse:
+        """Delete instance by name."""
+        resp = await self.transport.instances.slash(name).delete()
+        resp = ensure_response(resp, dict, AsyncResponse)
+        return resp
