@@ -146,7 +146,7 @@ class AbstractTransport(ABC):
             args["status_code"] = StatusCode(response["status_code"])
             if response["type"] == "async":
                 args["operation"] = response["operation"]
-                ret = AsyncResponse(**args)
+                ret = AsyncResponse(**args, transport=self)
             else:
                 ret = SyncResponse(**args)
         elif response["type"] == "error":
