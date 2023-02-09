@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiolxd"
-version = "0.1.0-r1"
+version = "0.1.1"
 description = "AsyncIO LXD API for Python 3"
 authors = ["Egor Ternovoy <cofob@riseup.net>"]
 repository = "https://github.com/cofob/aiolxd"
