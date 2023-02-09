@@ -1,9 +1,13 @@
+import logging
 from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 if TYPE_CHECKING:
     from ..transport import AbstractTransport
+
+
+logger = logging.getLogger(__name__)
 
 
 class StatusCode(Enum):
@@ -63,6 +67,7 @@ class AsyncResponse(BaseResponse):
 
     async def wait(self) -> SyncResponse:
         """Wait for an async operation to complete."""
+        logger.debug("Waiting for operation %s", self.operation)
         resp = await self.transport.get(f"{self.operation}/wait")
         if not isinstance(resp, SyncResponse):
             raise ValueError("Invalid response type")

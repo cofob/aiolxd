@@ -1,7 +1,8 @@
 import json
+import logging
 import ssl
 from abc import ABC, abstractmethod
-from asyncio import create_task
+from asyncio import Task, create_task
 from enum import Enum
 from typing import Any, Coroutine, Dict, Optional, Tuple, TypeVar
 
@@ -16,6 +17,8 @@ from .entities.response import (
 )
 from .exceptions import AioLXDResponseError, AioLXDResponseTypeError
 from .utils import update_query_params
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound="AbstractTransport")
 
@@ -73,6 +76,8 @@ class AbstractTransport(ABC):
 
     This class is used to make requests to the LXD API.
     """
+
+    ws_task: Optional[Task[Any]] = None
 
     @abstractmethod
     async def request(
@@ -160,13 +165,23 @@ class AbstractTransport(ABC):
 
         return ret
 
+    def _process_ws_response(self, response: Dict[str, Any]) -> None:
+        logger.debug("Received websocket event: %s", response)
+
     async def spawn_ws(self) -> None:
         """Start websocket event loop asynchronously."""
-        create_task(self.websocket())
+        if self.ws_task is not None:
+            raise RuntimeError("Websocket task already running")
+        self.ws_task = create_task(self.websocket())
+
+    async def close_ws(self) -> None:
+        """Close websocket event loop asynchronously."""
+        if self.ws_task is not None:
+            self.ws_task.cancel()
 
     async def close(self) -> None:
         """Close the transport."""
-        pass
+        await self.close_ws()
 
     async def __aenter__(self: T) -> T:
         """Async context manager entry point."""
@@ -231,8 +246,12 @@ class AsyncTransport(AbstractTransport):
                 params["filter"] = filter
             url = update_query_params(url, params)
 
+        logger.debug("Making %s request to %s", method.value, url)
+
         # Make request
         response = await self._session.request(method.value, url, **self._kwargs, **args)
+
+        logger.debug("Received response from %s: %s", url, response.status)
 
         if response.status >= 500:
             raise AioLXDResponseError(response, detail=f"Server error: {response.status} {response.reason}")
@@ -240,6 +259,7 @@ class AsyncTransport(AbstractTransport):
         # Process response
         try:
             obj = await response.json()
+            logger.debug("Response from %s: %s", url, obj)
         except aiohttp.ContentTypeError:
             raise AioLXDResponseError(
                 response, detail=f"Response is not JSON: {response.content_type} while expecting application/json"
@@ -253,13 +273,20 @@ class AsyncTransport(AbstractTransport):
 
     async def websocket(self) -> None:
         while True:
+            # Awful nesting, but it's the only way to get the exception handling right
             try:
                 async with self._session.ws_connect(self._url + "/1.0/events") as ws:
                     async for msg in ws:
-                        pass
+                        try:
+                            data = json.loads(msg.data)
+                            self._process_ws_response(data)
+                        except json.JSONDecodeError as e:
+                            logger.error(f"Failed to decode JSON: {e}")
+                            continue
             except Exception as e:
-                print(f"Exception occured in events websocket: {e}")
+                logger.error(f"Exception occured in events websocket: {e}, restarting...")
 
     async def close(self) -> None:
+        await super().close()
         if self._session_owner:
             await self._session.close()

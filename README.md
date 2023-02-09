@@ -36,7 +36,7 @@ asyncio.run(main())
 ## TODO
 
 - [x] Basic API (instance creation, deletion, etc.)
-- [ ] Logging
-- [ ] Websocket operation events
+- [x] Logging
+- [ ] Websocket operation events (websocket support exists, but events are not parsed)
 - [ ] Tests
 - [ ] More API endpoints
