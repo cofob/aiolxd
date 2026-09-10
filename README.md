@@ -1,3 +1,5 @@
+> **Archival notice:** This repository is archived and no longer maintained.
+
 # aiolxd
 
 WIP AsyncIO LXD API for Python 3.
